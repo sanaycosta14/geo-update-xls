@@ -1,82 +1,70 @@
+# 🚀 Atualizador de Latitude/Longitude
 
-# Atualizador de Latitude/Longitude
+Uma aplicação Streamlit para atualizar coordenadas geográficas (latitude/longitude) no banco de dados a partir de um arquivo Excel.
 
-Este projeto é uma interface web para processar arquivos XSL/XSLX com informações de coordenadas e atualizar um banco PostgreSQL.
+## 📋 Pré-requisitos
 
-## Como usar para usuários de Docker
+- Python 3.8+
+- PostgreSQL
+- Arquivo .env com as configurações do banco de dados
 
-1️⃣ Construa a imagem Docker:
+## 🔧 Instalação
 
+1. Clone o repositório:
 ```bash
-docker build -t atualizador-xml-app .
+git clone [URL_DO_REPOSITORIO]
+cd geo-update-xls
 ```
 
-2️⃣ Rode o container diretamente:
-
-use o docker-compose:
-
+2. Crie um ambiente virtual e ative-o:
 ```bash
-docker-compose up --build -d
-```
-
-3️⃣ Acesse [http://localhost:8501](http://localhost:8501) e use a interface para subir seu XML e atualizar o banco!
-
--------------------------------------------------------------------------------------------------------------------------------------
-
-OBS: temos arquivo .env para que consiga usar variáveis de ambiente sem precisar usar o docker.
-
-## Como usar para os não usuários de docker
-
-1️⃣ O que precisa instalar:
-
-✅ Python 3.11 (ou a versão que está no projeto)
-✅ Bibliotecas do projeto (listadas no requirements.txt)
-✅ Banco de dados já acessível (o Postgres rodando e configurado, via .env)
-✅ O arquivo .env com as variáveis de ambiente certinhas
-
-2️⃣ Passos para rodar localmente:
-
-- crie e ative o ambiente virtual
-
-```bash
-python3 -m venv venv
-source venv/bin/activate   # no Linux/Mac
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
 # ou
-venv\Scripts\activate.bat  # no Windows
+.venv\Scripts\activate  # Windows
 ```
 
-- Instale as dependências:
-
+3. Instale as dependências:
 ```bash
 pip install -r requirements.txt
 ```
 
-- Carregue as variáveis do .env no ambiente (opcional, porém recomendado):
-
-Linux
-```bash
-export $(cat .env | xargs)
+4. Configure o arquivo .env:
+```env
+DB_NAME=seu_banco
+DB_USER=seu_usuario
+DB_PASSWORD=sua_senha
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
-Windows (Power shell)
-```bash
-setx DB_NAME "seu-banco"
-setx DB_USER "nome-banco"
-setx DB_PASSWORD "senha-banco"
-setx DB_HOST "localhost"
-setx DB_PORT "5432" #se sua porta for padrão
-```
+## 🚀 Uso
 
-Execute o app do streamlit
+1. Ative o ambiente virtual (se ainda não estiver ativo)
+2. Execute a aplicação:
 ```bash
 streamlit run app.py
 ```
 
-Retorno exemplo
-```bash
-Local URL: http://localhost:8501
-Network URL: http://192.168.x.x:8501
+3. Acesse a aplicação no navegador (geralmente http://localhost:8501)
+
+## 📁 Estrutura do Projeto
+
+```
+.
+├── src/
+│   ├── config/         # Configurações do projeto
+│   ├── database/       # Conexão e queries do banco de dados
+│   ├── utils/          # Funções utilitárias
+│   └── views/          # Interface do usuário
+├── .env               # Variáveis de ambiente (não versionado)
+├── app.py            # Ponto de entrada da aplicação
+└── requirements.txt  # Dependências do projeto
 ```
 
-🚀 Pronto!
-A aplicação vai subir localmente, usando as variáveis do .env para acessar o banco.
+## 📝 Formato do Arquivo Excel
+
+O arquivo Excel deve conter as seguintes colunas:
+- Codigo_Propriedade
+- Latitude
+- Longitude (sim, está escrito assim mesmo)
