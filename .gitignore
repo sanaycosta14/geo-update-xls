@@ -166,3 +166,6 @@ cython_debug/
 
 # Streamlit secrets
 .streamlit/secrets.toml
+
+#docker compose
+docker-compose.yml

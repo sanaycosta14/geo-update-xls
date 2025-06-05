@@ -5,7 +5,7 @@ import os
 import pandas as pd
 import textwrap
 
-st.set_page_config(page_title="Atualizador de Latitude/Longitude", layout="centered")
+st.set_page_config(page_title="Atualizador de Latitude/Longitude", layout="wide")
 st.title("🚀 Atualizador de Latitude/Longitude")
 st.write("Arraste e solte seu arquivo XLS abaixo para processar e visualizar as alterações antes de atualizar o banco de dados.")
 
@@ -36,19 +36,49 @@ if uploaded_file is not None:
 
         # Mostrar pré-visualização dos dados formatados ANTES do update
         preview_df = pd.DataFrame(registros, columns=['Codigo_Propriedade', 'Latitude_Formatada', 'Longitude_Formatada'])
-        st.write("🔍 **Pré-visualização dos dados formatados:**")
-        st.dataframe(preview_df)
+
+        # Conectar ao banco e pegar o preview real
+        db_config = {
+            'dbname': os.environ.get('DB_NAME'),
+            'user': os.environ.get('DB_USER'),
+            'password': os.environ.get('DB_PASSWORD'),
+            'host': os.environ.get('DB_HOST'),
+            'port': os.environ.get('DB_PORT', '5432')
+        }
+        conn = psycopg2.connect(**db_config)
+        codigos = ", ".join(f"'{c}'" for c, _, _ in registros)
+        sql_before_update = textwrap.dedent(f'''
+            SELECT
+                pro.nu_codigoanimal,
+                ie.vl_latitude,
+                ie.vl_longitude
+            FROM
+                agrocomum.inscricaoestadual ie
+            JOIN
+                agrocomum.propriedade pro
+                ON pro.id_inscricaoestadual = ie.id_inscricaoestadual
+            WHERE
+                pro.nu_codigoanimal IN ({codigos});
+        ''')
+        before_preview_df = pd.read_sql_query(sql_before_update, conn)
+        conn.close()
+
+        # Mostrar as duas tabelas lado a lado na mesma seção
+        st.write("🔍 **Pré-visualização dos dados antes do update:**")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.write("📝 **Dados do XLS formatados:**")
+            st.dataframe(preview_df)
+
+        with col2:
+            st.write("📦 **Dados atuais no banco:**")
+            before_preview_df.columns = ['Codigo_Propriedade', 'Latitude', 'Longitude']
+            st.dataframe(before_preview_df)
 
         # Botão para atualizar
         if st.button("Atualizar Banco de Dados"):
             try:
-                db_config = {
-                    'dbname': os.environ.get('DB_NAME'),
-                    'user': os.environ.get('DB_USER'),
-                    'password': os.environ.get('DB_PASSWORD'),
-                    'host': os.environ.get('DB_HOST'),
-                    'port': os.environ.get('DB_PORT', '5432')
-                }
                 conn = psycopg2.connect(**db_config)
                 cur = conn.cursor()
 
@@ -66,9 +96,9 @@ if uploaded_file is not None:
 
                 st.success("Banco de dados atualizado com sucesso! 🚀")
 
-                # Gerar e executar o SELECT para mostrar preview dos dados reais no banco
-                codigos = ", ".join(f"'{c}'" for c, _, _ in registros)
-                sql_query = textwrap.dedent(f'''
+                # Gerar e executar o SELECT para mostrar preview dos dados reais no banco após update
+                conn = psycopg2.connect(**db_config)
+                sql_after_update = textwrap.dedent(f'''
                     SELECT
                         p.nome,
                         ll.loc_no,
@@ -96,7 +126,7 @@ if uploaded_file is not None:
                     WHERE
                         pro.nu_codigoanimal IN ({codigos});
                 ''')
-                final_preview_df = pd.read_sql_query(sql_query, conn)
+                final_preview_df = pd.read_sql_query(sql_after_update, conn)
                 conn.close()
 
                 st.write("📊 **Preview final após update:**")
