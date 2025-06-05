@@ -5,10 +5,10 @@ services:
     ports:
       - "8501:8501"
     environment:
-      - DB_NAME=db-sidaam-dev
-      - DB_USER=postgres
-      - DB_PASSWORD=adaf@#swxdb
-      - DB_HOST=46.202.150.246
-      - DB_PORT=5432
+      - DB_NAME=
+      - DB_USER=
+      - DB_PASSWORD=
+      - DB_HOST=
+      - DB_PORT=
     volumes:
       - .:/app
