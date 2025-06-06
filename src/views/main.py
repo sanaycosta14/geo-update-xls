@@ -15,8 +15,8 @@ def reset_app():
     st.query_params.clear()
     st.rerun()
 
-def process_excel_data(df):
-    """Processa os dados do arquivo Excel."""
+def process_xsl_data(df):
+    """Processa os dados do arquivo xsl."""
     registros = []
     for idx, row in df.iterrows():
         codigo = str(row['Codigo_Propriedade']).strip()
@@ -26,7 +26,7 @@ def process_excel_data(df):
     return registros
 
 def create_comparison_dataframe(preview_df, final_preview_df):
-    """Cria DataFrame comparativo entre dados do Excel e do banco."""
+    """Cria DataFrame comparativo entre dados do xsl e do banco."""
     comparison_df = pd.merge(
         preview_df.rename(columns={
             'Latitude_Formatada': 'Nova_Latitude',
@@ -114,7 +114,7 @@ def main():
     if st.session_state.stage == 'upload':
         placeholder_info.write("Arraste e solte seu arquivo XLS abaixo para processar e visualizar as alterações antes de atualizar o banco de dados.")
         
-        uploaded_file = st.file_uploader("Escolha um arquivo XLS", type=["xls", "xlsx"])
+        uploaded_file = st.file_uploader("Escolha um arquivo XLS/XLSX", type=["xls", "xlsx"])
         
         if uploaded_file is not None:
             st.session_state.stage = 'process'
@@ -124,8 +124,8 @@ def main():
     # Estágio de processamento
     elif st.session_state.stage == 'process':
         try:
-            df = pd.read_excel(st.session_state.current_file)
-            registros = process_excel_data(df)
+            df = pd.read_xsl(st.session_state.current_file)
+            registros = process_xsl_data(df)
             
             placeholder_info.empty()
 
