@@ -124,7 +124,7 @@ def main():
     # Estágio de processamento
     elif st.session_state.stage == 'process':
         try:
-            df = pd.read_xsl(st.session_state.current_file)
+            df = pd.read_excel(st.session_state.current_file)
             registros = process_xsl_data(df)
             
             placeholder_info.empty()
